@@ -1,0 +1,55 @@
+menu "HeartyPatch Configuration"
+
+config WIFI_SSID
+    string "WiFi SSID"
+    default "myssid"
+    help
+        SSID (network name) for the example to connect to.
+
+config WIFI_PASSWORD
+    string "WiFi Password"
+    default "password"
+    help
+        WiFi password (WPA or WPA2) for the example to use.
+
+        Can be left blank if the network has no security set.
+
+choice
+    bool "Custom Samplerate"
+    config SPS_128
+	    bool "Samplerate 128 sps"
+	    help
+		    Set samplerate to 128 sps
+    config SPS_256
+	    bool "Samplerate 256 sps"
+	    help
+		    Set samplerate to 256 sps
+    config SPS_512
+	    bool "Samplerate 512 sps"
+	    help
+		    Set samplerate to 512 sps (not recommended)
+endchoice
+
+config DHPF_ENABLE
+	bool "Enable DHPF"
+	default y
+	help
+		Enable/Disable Digital High Pass Filter
+
+config TCP_ENABLE
+	bool "Enable TCP"
+	help
+		Enable/Disable TCP
+		
+config MDNS_ENABLE
+	bool "Enable MDNS"
+	help
+		Enable/Disable MDNS
+
+config MAX30003_STATS_ENABLE
+	bool "Enable Stats"
+	default n
+	help
+		Enable/Disable Max30003 stats reporting to console
+
+endmenu
