@@ -37,6 +37,11 @@
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/error.h"
 #include "mbedtls/certs.h"
+#include "led_strip.h"
+
+#define BLINK_GPIO 14
+static uint8_t s_led_state = 1;
+static led_strip_t *pStrip_a;
 
 extern xSemaphoreHandle print_mux;
 char uart_data[50];
@@ -93,11 +98,46 @@ void kalam_wifi_init(void)
 
 }
 
+
+static void blink_led(void)
+{
+	ESP_LOGI(TAG, "Turning the LED %s!", s_led_state == true ? "ON" : "OFF");
+    /* If the addressable LED is enabled */
+    if (s_led_state) {
+        /* Set the LED pixel using RGB from 0 (0%) to 255 (100%) for each color */
+        pStrip_a->set_pixel(pStrip_a, 0, 16, 16, 16);
+        /* Refresh the strip to send data */
+        pStrip_a->refresh(pStrip_a, 100);
+    } else {
+        /* Set all LED off to clear all pixels */
+        pStrip_a->clear(pStrip_a, 50);
+    }
+	s_led_state = !s_led_state;
+}
+
+static void configure_led(void)
+{
+    ESP_LOGI(TAG, "Example configured to blink addressable LED!");
+    /* LED strip initialization with the GPIO and pixels number*/
+    pStrip_a = led_strip_init(0, BLINK_GPIO, 1);
+    /* Set all LED off to clear all pixels */
+    pStrip_a->clear(pStrip_a, 50);
+}
+
 void app_main(void)
 {
+    ESP_LOGI("ShiroSaki", "Link Start!");
+	configure_led();
+	blink_led();
+	vTaskDelay(200 / portTICK_PERIOD_MS);
+	blink_led();
+	vTaskDelay(200 / portTICK_PERIOD_MS);
+	blink_led();
+	vTaskDelay(500 / portTICK_PERIOD_MS);
+	blink_led();
+
     nvs_flash_init();
 
-    ESP_LOGI("ShiroSaki", "Link Start!");
     max30003_initchip(PIN_SPI_MISO,PIN_SPI_MOSI,PIN_SPI_SCK,PIN_SPI_CS);
 	vTaskDelay(2/ portTICK_PERIOD_MS);
 
@@ -111,3 +151,5 @@ void app_main(void)
 #endif
    
 }
+
+
